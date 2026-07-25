@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "fourtriplevictory",
+  "version": "1.0.0",
+  "name": "FPS Boost",
+  "description": "Optimizes rendering and improves frame rate",
+  "authors": ["Your Name"],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/fourtriplevictory/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.fourtriplevictory.autoshield.FourTripleVictory"
+    ],
+    "client": [
+      "com.fourtriplevictory.autoshield.FourTripleVictoryClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.10",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
