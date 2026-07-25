@@ -5,7 +5,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyMapping;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.AxeItem;
@@ -16,8 +16,8 @@ import org.lwjgl.glfw.GLFW;
 
 public class FourTripleVictoryClient implements ClientModInitializer {
     public static boolean enabled = true;
-    public static KeyMapping TOGGLE_KEY = KeyBindingHelper.registerKeyBinding(
-            new KeyMapping(
+    public static KeyBinding TOGGLE_KEY = KeyBindingHelper.registerKeyBinding(
+            new KeyBinding(
                     "key.fourtriplevictory.toggle",
                     GLFW.GLFW_KEY_R,
                     "key.categories.fourtriplevictory"
@@ -45,9 +45,9 @@ public class FourTripleVictoryClient implements ClientModInitializer {
                 return ActionResult.PASS;
             }
             if (needsSwapBack) {
-                originalSlot = inv.selected;
+                originalSlot = inv.selectedSlot;
             }
-            inv.selected = axeSlot;
+            inv.selectedSlot = axeSlot;
             needsSwapBack = true;
             swapBackTicks = 5;
             return ActionResult.PASS;
@@ -57,19 +57,19 @@ public class FourTripleVictoryClient implements ClientModInitializer {
             if (needsSwapBack) {
                 swapBackTicks--;
                 if (swapBackTicks <= 0) {
-                    MinecraftClient.getInstance().player.getInventory().selected = originalSlot;
+                    MinecraftClient.getInstance().player.getInventory().selectedSlot = originalSlot;
                     needsSwapBack = false;
                     swapBackTicks = -1;
                 }
             }
             if (TOGGLE_KEY.wasPressed()) {
                 enabled = !enabled;
-                MinecraftClient client = MinecraftClient.getInstance();
-                if (client.player != null) {
+                MinecraftClient mc = MinecraftClient.getInstance();
+                if (mc.player != null) {
                     if (enabled) {
-                    client.player.sendMessage(Text.literal("FPS Boost: ON").copy().withColor(0x55FF55), false);
+                        mc.player.sendMessage(Text.literal("FPS Boost: ON").copy().withColor(0x55FF55), false);
                     } else {
-                    client.player.sendMessage(Text.literal("FPS Boost: OFF").copy().withColor(0xFF5555), false);
+                        mc.player.sendMessage(Text.literal("FPS Boost: OFF").copy().withColor(0xFF5555), false);
                     }
                 }
             }
