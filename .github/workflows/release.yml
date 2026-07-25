@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,5 +32,4 @@ jobs:
           gh release create "$VERSION" \
             --title "FPS Boost $VERSION" \
             --notes "Auto-generated release for FPS Boost" \
-            build/libs/*.jar \
-            || echo "Release creation skipped or failed; continuing."
+            build/libs/*.jar
