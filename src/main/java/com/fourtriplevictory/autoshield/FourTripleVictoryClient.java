@@ -6,6 +6,8 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.util.Identifier;
+import java.lang.reflect.Field;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.AxeItem;
@@ -20,7 +22,7 @@ public class FourTripleVictoryClient implements ClientModInitializer {
             new KeyBinding(
                     "key.fourtriplevictory.toggle",
                     GLFW.GLFW_KEY_R,
-                    "key.categories.fourtriplevictory"
+                    KeyBinding.Category.create("key.categories.fourtriplevictory")
             )
     );
     public static int originalSlot = -1;
@@ -45,9 +47,21 @@ public class FourTripleVictoryClient implements ClientModInitializer {
                 return ActionResult.PASS;
             }
             if (needsSwapBack) {
-                originalSlot = inv.selectedSlot;
+                try {
+                    Field f = PlayerInventory.class.getDeclaredField("selectedSlot");
+                    f.setAccessible(true);
+                    originalSlot = f.getInt(inv);
+                } catch (Exception e) {
+                    return ActionResult.PASS;
+                }
             }
-            inv.selectedSlot = axeSlot;
+            try {
+                Field f = PlayerInventory.class.getDeclaredField("selectedSlot");
+                f.setAccessible(true);
+                f.setInt(inv, axeSlot);
+            } catch (Exception e) {
+                return ActionResult.PASS;
+            }
             needsSwapBack = true;
             swapBackTicks = 5;
             return ActionResult.PASS;
@@ -57,7 +71,12 @@ public class FourTripleVictoryClient implements ClientModInitializer {
             if (needsSwapBack) {
                 swapBackTicks--;
                 if (swapBackTicks <= 0) {
-                    MinecraftClient.getInstance().player.getInventory().selectedSlot = originalSlot;
+                     try {
+                         Field f = PlayerInventory.class.getDeclaredField("selectedSlot");
+                         f.setAccessible(true);
+                         f.setInt(MinecraftClient.getInstance().player.getInventory(), originalSlot);
+                     } catch (Exception e) {
+                     }
                     needsSwapBack = false;
                     swapBackTicks = -1;
                 }
