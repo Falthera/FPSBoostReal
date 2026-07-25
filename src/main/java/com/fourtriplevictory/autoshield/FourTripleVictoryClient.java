@@ -22,7 +22,7 @@ public class FourTripleVictoryClient implements ClientModInitializer {
             new KeyBinding(
                     "key.fourtriplevictory.toggle",
                     GLFW.GLFW_KEY_R,
-                    KeyBinding.Category.create("key.categories.fourtriplevictory")
+                    KeyBinding.Category.create(Identifier.of("key.categories.fourtriplevictory"))
             )
     );
     public static int originalSlot = -1;
