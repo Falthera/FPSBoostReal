@@ -35,6 +35,9 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.ClientboundEntityEventPacket;
 import net.minecraft.network.packet.s2c.play.ClientboundSetEntityMotionPacket;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import com.mojang.brigadier.arguments.StringArgumentType;
 
 public class FourTripleVictoryClient implements ClientModInitializer {
     public static boolean shieldBreakerEnabled = true;
@@ -96,6 +99,7 @@ public class FourTripleVictoryClient implements ClientModInitializer {
 
     public static boolean attackQueued = false;
     public static Entity queuedTarget = null;
+    public static final java.util.Set<String> trustedPlayers = new java.util.HashSet<>();
 
     @Override
     public void onInitializeClient() {
@@ -184,11 +188,39 @@ public class FourTripleVictoryClient implements ClientModInitializer {
                 }
             });
         }
+
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+            dispatcher.register(ClientCommandManager.literal("triggerbot")
+                .then(ClientCommandManager.literal("trust")
+                    .then(ClientCommandManager.argument("player", StringArgumentType.string())
+                        .executes(context -> {
+                            String name = StringArgumentType.getString(context, "player");
+                            trustedPlayers.add(name.toLowerCase());
+                            MinecraftClient.getInstance().player.sendMessage(Text.literal("Triggerbot trusted: " + name), false);
+                            return 1;
+                        })
+                    )
+                )
+                .then(ClientCommandManager.literal("untrust")
+                    .then(ClientCommandManager.argument("player", StringArgumentType.string())
+                        .executes(context -> {
+                            String name = StringArgumentType.getString(context, "player");
+                            trustedPlayers.remove(name.toLowerCase());
+                            MinecraftClient.getInstance().player.sendMessage(Text.literal("Triggerbot untrusted: " + name), false);
+                            return 1;
+                        })
+                    )
+                )
+            );
+        });
     }
 
     private void handleTriggerbot(MinecraftClient mc) {
         Entity target = mc.targetedEntity;
         if (target == null) {
+            return;
+        }
+        if (target instanceof PlayerEntity playerTarget && trustedPlayers.contains(playerTarget.getName().getString().toLowerCase())) {
             return;
         }
         if (triggerbotPlayersOnly && !(target instanceof PlayerEntity)) {
