@@ -40,12 +40,13 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import com.mojang.brigadier.arguments.StringArgumentType;
 
 public class FourTripleVictoryClient implements ClientModInitializer {
+    private static final KeyBinding.Category CATEGORY = KeyBinding.Category.create(Identifier.of("fourtriplevictory", "category"));
     public static boolean shieldBreakerEnabled = true;
     public static KeyBinding TOGGLE_KEY = KeyBindingHelper.registerKeyBinding(
             new KeyBinding(
                     "key.fourtriplevictory.toggle",
                     GLFW.GLFW_KEY_R,
-                    KeyBinding.Category.create(Identifier.of("fourtriplevictory", "category"))
+                    CATEGORY
             )
     );
     public static int originalSlot = -1;
@@ -56,7 +57,7 @@ public class FourTripleVictoryClient implements ClientModInitializer {
             new KeyBinding(
                     "key.fourtriplevictory.triggerbot",
                     GLFW.GLFW_KEY_T,
-                    KeyBinding.Category.create(Identifier.of("fourtriplevictory", "category"))
+                    CATEGORY
             )
     );
     public static long lastTriggerbotAttack = 0L;
@@ -69,7 +70,7 @@ public class FourTripleVictoryClient implements ClientModInitializer {
             new KeyBinding(
                     "key.fourtriplevictory.webdrain",
                     GLFW.GLFW_KEY_Y,
-                    KeyBinding.Category.create(Identifier.of("fourtriplevictory", "category"))
+                    CATEGORY
             )
     );
     public static int webDrainRadius = 5;
