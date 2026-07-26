@@ -12,7 +12,6 @@ public class JumpExecutor {
         if (player.isTouchingWater()) return false;
         if (player.isInLava()) return false;
         if (player.isClimbing()) return false;
-        if (player.isFallFlying()) return false;
         return true;
     }
 }

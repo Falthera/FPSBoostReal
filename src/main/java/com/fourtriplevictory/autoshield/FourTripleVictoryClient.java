@@ -80,8 +80,6 @@ public class FourTripleVictoryClient implements ClientModInitializer {
 
     public static boolean hitboxClipEnabled = true;
     public static boolean knockbackReductionEnabled = true;
-    public static boolean microReachEnabled = true;
-    public static boolean hitRegPriorityEnabled = true;
     public static boolean jumpResetEnabled = true;
 
     @Override
@@ -151,10 +149,6 @@ public class FourTripleVictoryClient implements ClientModInitializer {
             if (webDrainEnabled) {
                 handleWebDrain(mc);
             }
-        });
-
-        ClientPlayConnectionEvents.DISCONNECT.register(handler -> {
-            JumpResetController.onDisconnect();
         });
     }
 

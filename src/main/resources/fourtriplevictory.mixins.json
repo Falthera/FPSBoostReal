@@ -4,8 +4,7 @@
   "package": "com.fourtriplevictory.autoshield.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "ClientPlayerEntityMixin",
-    "LocalPlayerMixin"
+    "ClientPlayerEntityMixin"
   ],
   "injectors": {"defaultRequire": 1}
 }
