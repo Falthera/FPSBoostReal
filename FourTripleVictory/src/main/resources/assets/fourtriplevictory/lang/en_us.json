@@ -1,11 +1,7 @@
 {
+  "key.categories.fourtriplevictory": "FourTripleVictory",
   "key.fourtriplevictory.toggle": "Toggle Shield Breaker",
   "key.fourtriplevictory.triggerbot": "Toggle Triggerbot",
   "key.fourtriplevictory.webdrain": "Toggle Web Drain",
-  "key.categories.fourtriplevictory": "FourTripleVictory"
-  "commands.fourtriplevictory.triggerbot.trust": "Trusted %s from triggerbot",
-  "commands.fourtriplevictory.triggerbot.untrust": "Untrusted %s from triggerbot",
-  "commands.fourtriplevictory.triggerbot.trust.success": "Trusted %s from triggerbot",
-  "commands.fourtriplevictory.triggerbot.untrust.success": "Untrusted %s from triggerbot"
+  "category.fourtriplevictory.category": "FourTripleVictory"
 }
-  
