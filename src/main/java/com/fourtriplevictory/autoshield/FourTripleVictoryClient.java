@@ -3,7 +3,6 @@ package com.fourtriplevictory.autoshield;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -79,10 +78,6 @@ public class FourTripleVictoryClient implements ClientModInitializer {
     public static float aimTargetPitch = 0f;
 
     public static boolean hitboxClipEnabled = true;
-    public static boolean knockbackReductionEnabled = true;
-    public static boolean microReachEnabled = true;
-    public static boolean hitRegPriorityEnabled = true;
-    public static boolean jumpResetEnabled = true;
 
     @Override
     public void onInitializeClient() {
@@ -135,9 +130,6 @@ public class FourTripleVictoryClient implements ClientModInitializer {
                 webDrainEnabled = !webDrainEnabled;
                 mc.player.sendMessage(Text.literal("Web Drain: " + (webDrainEnabled ? "ON" : "OFF")).copy().withColor(webDrainEnabled ? 0x55FF55 : 0xFF5555), false);
             }
-            if (jumpResetEnabled) {
-                JumpResetController.onEndTick();
-            }
             if (mc.player.isDead() || mc.player.isSpectator()) {
                 return;
             }
@@ -151,13 +143,6 @@ public class FourTripleVictoryClient implements ClientModInitializer {
             if (webDrainEnabled) {
                 handleWebDrain(mc);
             }
-            if (hitRegPriorityEnabled) {
-                handleHitRegistrationPriority(mc);
-            }
-        });
-
-        ClientPlayConnectionEvents.DISCONNECT.register(handler -> {
-            JumpResetController.onDisconnect();
         });
     }
 
@@ -342,20 +327,6 @@ public class FourTripleVictoryClient implements ClientModInitializer {
         }
         isAiming = false;
         aimTarget = null;
-    }
-
-    private void handleHitRegistrationPriority(MinecraftClient mc) {
-        Entity target = mc.targetedEntity;
-        if (target == null || target.isRemoved() || ((LivingEntity) target).isDead()) {
-            return;
-        }
-        if (mc.options.attackKey.wasPressed()) {
-            mc.execute(() -> {
-                if (mc.player != null && mc.targetedEntity != null && !mc.targetedEntity.isRemoved() && !((LivingEntity) mc.targetedEntity).isDead()) {
-                    mc.player.attack(mc.targetedEntity);
-                }
-            });
-        }
     }
 
     private int findAxeSlot(PlayerInventory inv) {
