@@ -45,7 +45,7 @@ public class FourTripleVictoryClient implements ClientModInitializer {
             new KeyBinding(
                     "key.fourtriplevictory.toggle",
                     GLFW.GLFW_KEY_R,
-                    KeyBinding.Category.create(Identifier.of("fourtriplevictory", "category"))
+                    KeyBinding.Category.create(Identifier.of("key.categories.fourtriplevictory"))
             )
     );
     public static int originalSlot = -1;
@@ -56,7 +56,7 @@ public class FourTripleVictoryClient implements ClientModInitializer {
             new KeyBinding(
                     "key.fourtriplevictory.triggerbot",
                     GLFW.GLFW_KEY_T,
-                    KeyBinding.Category.create(Identifier.of("fourtriplevictory", "category"))
+                    KeyBinding.Category.create(Identifier.of("key.categories.fourtriplevictory"))
             )
     );
     public static long lastTriggerbotAttack = 0L;
@@ -69,7 +69,7 @@ public class FourTripleVictoryClient implements ClientModInitializer {
             new KeyBinding(
                     "key.fourtriplevictory.webdrain",
                     GLFW.GLFW_KEY_Y,
-                    KeyBinding.Category.create(Identifier.of("fourtriplevictory", "category"))
+                    KeyBinding.Category.create(Identifier.of("key.categories.fourtriplevictory"))
             )
     );
     public static int webDrainRadius = 5;
