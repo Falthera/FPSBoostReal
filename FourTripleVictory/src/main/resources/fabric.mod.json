@@ -6,7 +6,6 @@
   "description": "PvP utility mod",
   "authors": ["Author"],
   "license": "MIT",
-  "icon": "assets/fourtriplevictory/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
@@ -20,7 +19,7 @@
     "fourtriplevictory.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.16.10",
+    "fabricloader": ">=0.19.3",
     "minecraft": "~1.21.11",
     "java": ">=21",
     "fabric-api": "*"

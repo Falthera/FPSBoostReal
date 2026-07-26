@@ -178,7 +178,7 @@ public class FourTripleVictoryClient implements ClientModInitializer {
             }
         });
 
-        ClientConnection conn = MinecraftClient.getInstance().getNetworkHandler().getConnection();
+        ClientConnection conn = MinecraftClient.getInstance().getNetworkHandler() != null ? MinecraftClient.getInstance().getNetworkHandler().getConnection() : null;
         if (conn != null) {
             conn.channel.pipeline().addFirst(new ChannelInboundHandlerAdapter() {
                 @Override
