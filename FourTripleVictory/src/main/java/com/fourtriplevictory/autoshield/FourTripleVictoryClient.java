@@ -114,16 +114,6 @@ public class FourTripleVictoryClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
         });
 
-        ClientConnection conn = MinecraftClient.getInstance().getNetworkHandler().getConnection();
-        if (conn != null) {
-            conn.channel.pipeline().addFirst(new ChannelInboundHandlerAdapter() {
-                @Override
-                public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-                    super.channelRead(ctx, msg);
-                }
-            });
-        }
-
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("triggerbot")
                 .then(ClientCommandManager.literal("trust")

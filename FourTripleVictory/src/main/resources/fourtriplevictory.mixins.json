@@ -1,11 +1,7 @@
 {
-  "required": true,
+  "required": false,
   "package": "com.fourtriplevictory.autoshield",
   "compatibilityLevel": "JAVA_21",
   "plugin": "org.spongepowered.asm.mixin.platform.fabric.FabricMixinPlatformPlugin",
-  "mixins": [
-    "MixinLivingEntity",
-    "MixinClientPlayerEntity",
-    "MixinClientPlayerInteractionManager"
-  ]
+  "mixins": []
 }
