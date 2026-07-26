@@ -14,7 +14,7 @@ public class MixinClientPlayerInteractionManager {
     @Unique
     private static double microReach = 0.08;
 
-    @Inject(method = "method_2903", at = @At("HEAD"))
+    @Inject(method = "attackEntity(Lnet/minecraft/entity/Entity;)Z", at = @At("HEAD"))
     private void onAttack(Entity target, CallbackInfoReturnable<Boolean> cir) {
         if (!FourTripleVictoryClient.microReachEnabled || target == null) {
             return;

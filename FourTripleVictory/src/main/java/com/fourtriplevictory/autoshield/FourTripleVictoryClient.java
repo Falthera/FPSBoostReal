@@ -100,6 +100,7 @@ public class FourTripleVictoryClient implements ClientModInitializer {
     public static boolean attackQueued = false;
     public static Entity queuedTarget = null;
     public static final java.util.Set<String> trustedPlayers = new java.util.HashSet<>();
+    private static boolean jumpResetListenerAdded = false;
 
     @Override
     public void onInitializeClient() {
@@ -128,68 +129,28 @@ public class FourTripleVictoryClient implements ClientModInitializer {
         });
 
         ClientTickEvents.START_CLIENT_TICK.register(client -> {
+            if (!jumpResetListenerAdded && client.getNetworkHandler() != null) {
+                ClientConnection conn = client.getNetworkHandler().getConnection();
+                if (conn != null) {
+                    conn.channel.pipeline().addFirst(new ChannelInboundHandlerAdapter() {
+                        @Override
+                        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+                            if (msg instanceof Packet<?> packet) {
+                                JumpResetController.onPacketReceived(packet);
+                            }
+                            super.channelRead(ctx, msg);
+                        }
+                    });
+                    jumpResetListenerAdded = true;
+                }
+            }
+
             if (attackQueued && queuedTarget != null && MinecraftClient.getInstance().player != null && !((LivingEntity) queuedTarget).isDead()) {
                 MinecraftClient.getInstance().player.attack(queuedTarget);
                 attackQueued = false;
                 queuedTarget = null;
             }
         });
-
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            MinecraftClient mc = MinecraftClient.getInstance();
-            if (mc.player == null) {
-                return;
-            }
-            if (needsSwapBack) {
-                swapBackTicks--;
-                if (swapBackTicks <= 0) {
-                    mc.player.getInventory().setSelectedSlot(originalSlot);
-                    needsSwapBack = false;
-                    swapBackTicks = -1;
-                }
-            }
-            if (TOGGLE_KEY.wasPressed()) {
-                shieldBreakerEnabled = !shieldBreakerEnabled;
-                mc.player.sendMessage(Text.literal("Shield Breaker: " + (shieldBreakerEnabled ? "ON" : "OFF")).copy().withColor(shieldBreakerEnabled ? 0x55FF55 : 0xFF5555), false);
-            }
-            if (TRIGGERBOT_KEY.wasPressed()) {
-                triggerbotEnabled = !triggerbotEnabled;
-                mc.player.sendMessage(Text.literal("Triggerbot: " + (triggerbotEnabled ? "ON" : "OFF")).copy().withColor(triggerbotEnabled ? 0x55FF55 : 0xFF5555), false);
-            }
-            if (WEBDRAIN_KEY.wasPressed()) {
-                webDrainEnabled = !webDrainEnabled;
-                mc.player.sendMessage(Text.literal("Web Drain: " + (webDrainEnabled ? "ON" : "OFF")).copy().withColor(webDrainEnabled ? 0x55FF55 : 0xFF5555), false);
-            }
-            if (mc.player.isDead() || mc.player.isSpectator()) {
-                return;
-            }
-            if (isAiming) {
-                handleSmoothAim(mc);
-                return;
-            }
-            if (triggerbotEnabled) {
-                handleTriggerbot(mc);
-            }
-            if (webDrainEnabled) {
-                handleWebDrain(mc);
-            }
-            if (attackQueued) {
-                attackQueued = false;
-            }
-        });
-
-        ClientConnection conn = MinecraftClient.getInstance().getNetworkHandler().getConnection();
-        if (conn != null) {
-            conn.channel.pipeline().addFirst(new ChannelInboundHandlerAdapter() {
-                @Override
-                public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-                    if (msg instanceof Packet<?> packet) {
-                        JumpResetController.onPacketReceived(packet);
-                    }
-                    super.channelRead(ctx, msg);
-                }
-            });
-        }
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("triggerbot")

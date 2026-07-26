@@ -16,7 +16,7 @@ public class MixinLivingEntity {
     @Unique
     private boolean reduceKnockback = false;
 
-    @Inject(method = "method_6099", at = @At("HEAD"))
+    @Inject(method = "damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", at = @At("HEAD"))
     private void onDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         if (!FourTripleVictoryClient.knockbackReductionEnabled) {
             return;
