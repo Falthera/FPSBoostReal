@@ -36,11 +36,15 @@ jobs:
           TAG="v${{ steps.version.outputs.version }}"
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git tag "$TAG"
-          git push origin "$TAG"
+          if [ "$(git tag -l "$TAG")" = "" ]; then
+            git tag "$TAG"
+            git push origin "$TAG"
+          else
+            echo "Tag $TAG already exists, skipping tag creation"
+          fi
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          gh release create "v$VERSION" --title "FourTripleVictory v$VERSION" --notes "Auto-generated release" build/libs/*.jar
+          gh release create "v$VERSION" --title "FourTripleVictory v$VERSION" --notes "Auto-generated release" build/libs/*.jar -f
