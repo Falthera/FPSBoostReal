@@ -152,6 +152,49 @@ public class FourTripleVictoryClient implements ClientModInitializer {
             }
         });
 
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            MinecraftClient mc = MinecraftClient.getInstance();
+            if (mc.player == null) {
+                return;
+            }
+            if (needsSwapBack) {
+                swapBackTicks--;
+                if (swapBackTicks <= 0) {
+                    mc.player.getInventory().setSelectedSlot(originalSlot);
+                    needsSwapBack = false;
+                    swapBackTicks = -1;
+                }
+            }
+            if (TOGGLE_KEY.wasPressed()) {
+                shieldBreakerEnabled = !shieldBreakerEnabled;
+                mc.player.sendMessage(Text.literal("Shield Breaker: " + (shieldBreakerEnabled ? "ON" : "OFF")).copy().withColor(shieldBreakerEnabled ? 0x55FF55 : 0xFF5555), false);
+            }
+            if (TRIGGERBOT_KEY.wasPressed()) {
+                triggerbotEnabled = !triggerbotEnabled;
+                mc.player.sendMessage(Text.literal("Triggerbot: " + (triggerbotEnabled ? "ON" : "OFF")).copy().withColor(triggerbotEnabled ? 0x55FF55 : 0xFF5555), false);
+            }
+            if (WEBDRAIN_KEY.wasPressed()) {
+                webDrainEnabled = !webDrainEnabled;
+                mc.player.sendMessage(Text.literal("Web Drain: " + (webDrainEnabled ? "ON" : "OFF")).copy().withColor(webDrainEnabled ? 0x55FF55 : 0xFF5555), false);
+            }
+            if (mc.player.isDead() || mc.player.isSpectator()) {
+                return;
+            }
+            if (isAiming) {
+                handleSmoothAim(mc);
+                return;
+            }
+            if (triggerbotEnabled) {
+                handleTriggerbot(mc);
+            }
+            if (webDrainEnabled) {
+                handleWebDrain(mc);
+            }
+            if (attackQueued) {
+                attackQueued = false;
+            }
+        });
+
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("triggerbot")
                 .then(ClientCommandManager.literal("trust")
