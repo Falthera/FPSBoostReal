@@ -129,22 +129,6 @@ public class FourTripleVictoryClient implements ClientModInitializer {
         });
 
         ClientTickEvents.START_CLIENT_TICK.register(client -> {
-            if (!jumpResetListenerAdded && client.getNetworkHandler() != null) {
-                ClientConnection conn = client.getNetworkHandler().getConnection();
-                if (conn != null) {
-                    conn.channel.pipeline().addFirst(new ChannelInboundHandlerAdapter() {
-                        @Override
-                        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-                            if (msg instanceof Packet<?> packet) {
-                                JumpResetController.onPacketReceived(packet);
-                            }
-                            super.channelRead(ctx, msg);
-                        }
-                    });
-                    jumpResetListenerAdded = true;
-                }
-            }
-
             if (attackQueued && queuedTarget != null && MinecraftClient.getInstance().player != null && !((LivingEntity) queuedTarget).isDead()) {
                 MinecraftClient.getInstance().player.attack(queuedTarget);
                 attackQueued = false;
@@ -194,6 +178,19 @@ public class FourTripleVictoryClient implements ClientModInitializer {
                 attackQueued = false;
             }
         });
+
+        ClientConnection conn = MinecraftClient.getInstance().getNetworkHandler().getConnection();
+        if (conn != null) {
+            conn.channel.pipeline().addFirst(new ChannelInboundHandlerAdapter() {
+                @Override
+                public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+                    if (msg instanceof Packet<?> packet) {
+                        JumpResetController.onPacketReceived(packet);
+                    }
+                    super.channelRead(ctx, msg);
+                }
+            });
+        }
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("triggerbot")
