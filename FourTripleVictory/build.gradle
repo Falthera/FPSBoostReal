@@ -20,7 +20,7 @@ repositories {
 dependencies {
     minecraft "com.mojang:minecraft:1.21.11"
     mappings "net.fabricmc:yarn:1.21.11+build.1:v2"
-    modImplementation "net.fabricmc:fabric-loader:0.16.10"
+    modImplementation "net.fabricmc:fabric-loader:0.19.3"
     modImplementation "net.fabricmc.fabric-api:fabric-api:0.141.5+1.21.11"
     modImplementation "org.spongepowered:mixin:0.8.5"
     annotationProcessor "org.spongepowered:mixin:0.8.5"
@@ -46,7 +46,7 @@ tasks.withType(Javadoc).configureEach {
 java {
     withSourcesJar()
     toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
