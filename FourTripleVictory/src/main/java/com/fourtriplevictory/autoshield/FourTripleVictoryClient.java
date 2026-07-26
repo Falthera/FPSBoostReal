@@ -105,78 +105,13 @@ public class FourTripleVictoryClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         AttackEntityCallback.EVENT.register((player, world, hand, entity, entityHitResult) -> {
-            if (!shieldBreakerEnabled || entity == null) {
-                return ActionResult.PASS;
-            }
-            if (!(entity instanceof PlayerEntity target)) {
-                return ActionResult.PASS;
-            }
-            if (!target.isBlocking()) {
-                return ActionResult.PASS;
-            }
-            PlayerInventory inv = player.getInventory();
-            int axeSlot = findAxeSlot(inv);
-            if (axeSlot == -1) {
-                return ActionResult.PASS;
-            }
-            if (!needsSwapBack) {
-                originalSlot = inv.getSelectedSlot();
-            }
-            inv.setSelectedSlot(axeSlot);
-            needsSwapBack = true;
-            swapBackTicks = 5;
             return ActionResult.PASS;
         });
 
         ClientTickEvents.START_CLIENT_TICK.register(client -> {
-            if (attackQueued && queuedTarget != null && MinecraftClient.getInstance().player != null && !((LivingEntity) queuedTarget).isDead()) {
-                MinecraftClient.getInstance().player.attack(queuedTarget);
-                attackQueued = false;
-                queuedTarget = null;
-            }
         });
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            MinecraftClient mc = MinecraftClient.getInstance();
-            if (mc.player == null) {
-                return;
-            }
-            if (needsSwapBack) {
-                swapBackTicks--;
-                if (swapBackTicks <= 0) {
-                    mc.player.getInventory().setSelectedSlot(originalSlot);
-                    needsSwapBack = false;
-                    swapBackTicks = -1;
-                }
-            }
-            if (TOGGLE_KEY.wasPressed()) {
-                shieldBreakerEnabled = !shieldBreakerEnabled;
-                mc.player.sendMessage(Text.literal("Shield Breaker: " + (shieldBreakerEnabled ? "ON" : "OFF")).copy().withColor(shieldBreakerEnabled ? 0x55FF55 : 0xFF5555), false);
-            }
-            if (TRIGGERBOT_KEY.wasPressed()) {
-                triggerbotEnabled = !triggerbotEnabled;
-                mc.player.sendMessage(Text.literal("Triggerbot: " + (triggerbotEnabled ? "ON" : "OFF")).copy().withColor(triggerbotEnabled ? 0x55FF55 : 0xFF5555), false);
-            }
-            if (WEBDRAIN_KEY.wasPressed()) {
-                webDrainEnabled = !webDrainEnabled;
-                mc.player.sendMessage(Text.literal("Web Drain: " + (webDrainEnabled ? "ON" : "OFF")).copy().withColor(webDrainEnabled ? 0x55FF55 : 0xFF5555), false);
-            }
-            if (mc.player.isDead() || mc.player.isSpectator()) {
-                return;
-            }
-            if (isAiming) {
-                handleSmoothAim(mc);
-                return;
-            }
-            if (triggerbotEnabled) {
-                handleTriggerbot(mc);
-            }
-            if (webDrainEnabled) {
-                handleWebDrain(mc);
-            }
-            if (attackQueued) {
-                attackQueued = false;
-            }
         });
 
         ClientConnection conn = MinecraftClient.getInstance().getNetworkHandler().getConnection();
@@ -184,9 +119,6 @@ public class FourTripleVictoryClient implements ClientModInitializer {
             conn.channel.pipeline().addFirst(new ChannelInboundHandlerAdapter() {
                 @Override
                 public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-                    if (msg instanceof Packet<?> packet) {
-                        JumpResetController.onPacketReceived(packet);
-                    }
                     super.channelRead(ctx, msg);
                 }
             });
