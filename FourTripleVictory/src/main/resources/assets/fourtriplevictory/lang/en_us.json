@@ -3,6 +3,7 @@
   "key.fourtriplevictory.triggerbot": "Toggle Triggerbot",
   "key.fourtriplevictory.webdrain": "Toggle Web Drain",
   "key.categories.fourtriplevictory": "FourTripleVictory",
+  "category.fourtriplevictory.category": "FourTripleVictory",
   "commands.fourtriplevictory.triggerbot.trust": "Trusted %s from triggerbot",
   "commands.fourtriplevictory.triggerbot.untrust": "Untrusted %s from triggerbot",
   "commands.fourtriplevictory.triggerbot.trust.success": "Trusted %s from triggerbot",
