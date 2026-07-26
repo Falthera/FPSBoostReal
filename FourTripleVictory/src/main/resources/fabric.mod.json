@@ -6,7 +6,6 @@
   "description": "PvP utility mod",
   "authors": ["Author"],
   "license": "MIT",
-  "icon": "assets/fourtriplevictory/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
