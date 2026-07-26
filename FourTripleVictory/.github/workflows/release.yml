@@ -26,8 +26,15 @@ jobs:
       - name: Build with Gradle
         run: gradle build
       - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION=${GITHUB_REF#refs/tags/}
           gh release create "$VERSION" --title "FourTripleVictory $VERSION" --notes "Auto-generated release" build/libs/*.jar
+      - name: Upload Artifacts
+        if: "!startsWith(github.ref, 'refs/tags/')"
+        uses: actions/upload-artifact@v4
+        with:
+          name: fourtriplevictory-artifacts
+          path: build/libs/*.jar
