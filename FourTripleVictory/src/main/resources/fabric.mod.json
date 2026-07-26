@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "fourtriplevictory",
+  "version": "1.0.0",
+  "name": "FourTripleVictory",
+  "description": "PvP utility mod",
+  "authors": ["Author"],
+  "license": "MIT",
+  "icon": "assets/fourtriplevictory/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.fourtriplevictory.autoshield.FourTripleVictory"
+    ],
+    "client": [
+      "com.fourtriplevictory.autoshield.FourTripleVictoryClient"
+    ]
+  },
+  "mixins": [
+    "fourtriplevictory.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.10",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
