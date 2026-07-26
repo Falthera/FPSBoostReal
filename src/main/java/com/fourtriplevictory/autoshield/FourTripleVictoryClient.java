@@ -8,6 +8,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.util.Identifier;
 import java.lang.reflect.Field;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.AxeItem;
@@ -28,6 +29,19 @@ public class FourTripleVictoryClient implements ClientModInitializer {
     public static int originalSlot = -1;
     public static int swapBackTicks = -1;
     public static boolean needsSwapBack = false;
+    public static boolean triggerbotEnabled = false;
+    public static KeyBinding TRIGGERBOT_KEY = KeyBindingHelper.registerKeyBinding(
+            new KeyBinding(
+                    "key.fourtriplevictory.triggerbot",
+                    GLFW.GLFW_KEY_T,
+                    KeyBinding.Category.create(Identifier.of("key.categories.fourtriplevictory"))
+            )
+    );
+    public static long lastTriggerbotAttack = 0L;
+    public static int triggerbotDelay = 50;
+    public static int triggerbotRandomization = 20;
+    public static boolean triggerbotPlayersOnly = true;
+    public static double triggerbotRange = 3.5;
 
     @Override
     public void onInitializeClient() {
@@ -92,6 +106,58 @@ public class FourTripleVictoryClient implements ClientModInitializer {
                     }
                 }
             }
+            if (TRIGGERBOT_KEY.wasPressed()) {
+                triggerbotEnabled = !triggerbotEnabled;
+                MinecraftClient mc = MinecraftClient.getInstance();
+                if (mc.player != null) {
+                    if (triggerbotEnabled) {
+                        mc.player.sendMessage(Text.literal("Triggerbot: ON").copy().withColor(0x55FF55), false);
+                    } else {
+                        mc.player.sendMessage(Text.literal("Triggerbot: OFF").copy().withColor(0xFF5555), false);
+                    }
+                }
+            }
+            if (!triggerbotEnabled) {
+                return;
+            }
+            MinecraftClient mc = MinecraftClient.getInstance();
+            if (mc.player == null || mc.player.isDead() || mc.player.isSpectator()) {
+                return;
+            }
+            Entity target = mc.targetedEntity;
+            if (target == null) {
+                return;
+            }
+            if (triggerbotPlayersOnly && !(target instanceof PlayerEntity)) {
+                return;
+            }
+            if (target.isDead() || target.isInvulnerable()) {
+                return;
+            }
+            double distSq = mc.player.squaredDistanceTo(target);
+            if (distSq > triggerbotRange * triggerbotRange) {
+                return;
+            }
+            if (mc.player.getAttackCooldownProgress(0.0f) < 1.0f) {
+                return;
+            }
+            if (mc.player.handSwinging) {
+                return;
+            }
+            long now = System.currentTimeMillis();
+            long elapsed = now - lastTriggerbotAttack;
+            int jitter = (int) ((Math.random() * triggerbotRandomization * 2) - triggerbotRandomization);
+            int adjustedDelay = Math.max(0, triggerbotDelay + jitter);
+            if (elapsed < adjustedDelay) {
+                return;
+            }
+            final Entity attackTarget = target;
+            MinecraftClient.execute(() -> {
+                if (mc.player != null && attackTarget != null && !attackTarget.isDead()) {
+                    mc.player.attack(attackTarget);
+                }
+            });
+            lastTriggerbotAttack = now;
         });
     }
 
