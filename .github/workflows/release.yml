@@ -2,7 +2,8 @@ name: Release
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 permissions:
   contents: write
@@ -10,37 +11,52 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          java-version: "21"
+          distribution: temurin
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-      - name: Extract version
-        id: version
-        run: |
-          VERSION=$(grep '^version=' gradle.properties | cut -d'=' -f2)
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-      - name: Build with Gradle
+
+      - name: Build
         run: gradle build
-      - name: Create tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create next tag
+        id: tag
         run: |
-          TAG="v${{ steps.version.outputs.version }}"
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git tag "$TAG"
-          git push origin "$TAG"
+          git fetch --tags
+
+          LAST_TAG=$(git tag -l "v*" --sort=-v:refname | head -n1)
+
+          if [ -z "$LAST_TAG" ]; then
+            VERSION="v1.0.0"
+          else
+            VERSION=$(echo "$LAST_TAG" | awk -F. '{printf "v%d.%d.%d",$1+0,$2,$3+1}')
+          fi
+
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git tag "$VERSION"
+          git push origin "$VERSION"
+
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION="${{ steps.version.outputs.version }}"
-          gh release create "v$VERSION" --title "FourTripleVictory v$VERSION" --notes "Auto-generated release" build/libs/*.jar
+          gh release create "${{ steps.tag.outputs.version }}" \
+            --title "FourTripleVictory ${{ steps.tag.outputs.version }}" \
+            --notes "Auto-generated release" \
+            build/libs/*.jar
