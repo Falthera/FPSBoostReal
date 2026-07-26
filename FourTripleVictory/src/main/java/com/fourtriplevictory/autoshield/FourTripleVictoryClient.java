@@ -182,9 +182,11 @@ public class FourTripleVictoryClient implements ClientModInitializer {
         if (conn != null) {
             conn.channel.pipeline().addFirst(new ChannelInboundHandlerAdapter() {
                 @Override
-                public boolean acceptInboundMessage(Object msg) {
-                    JumpResetController.onPacketReceived((Packet<?>) msg);
-                    return true;
+                public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+                    if (msg instanceof Packet<?> packet) {
+                        JumpResetController.onPacketReceived(packet);
+                    }
+                    super.channelRead(ctx, msg);
                 }
             });
         }
