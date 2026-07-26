@@ -25,7 +25,7 @@ jobs:
       - name: Extract version
         id: version
         run: |
-          VERSION=$(grep '^version=' gradle.properties | cut -d'=' -f2)
+          VERSION=$(grep -oP "version\s*=\s*'\K[^']+" build.gradle)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
       - name: Build with Gradle
         run: gradle build
