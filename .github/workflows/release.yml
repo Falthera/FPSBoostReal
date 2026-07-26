@@ -28,23 +28,25 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Build
-        run: gradle build
+        run: ./gradlew build
 
       - name: Create next tag
         id: tag
+        shell: bash
         run: |
           git fetch --tags
 
-          LAST_TAG=$(git tag -l "v*" --sort=-v:refname | head -n1)
+          LAST_TAG=$(git tag -l "v[0-9]*.[0-9]*.[0-9]*" --sort=-v:refname | head -n1)
 
           if [ -z "$LAST_TAG" ]; then
             VERSION="v1.0.0"
           else
-            VERSION=$(echo "$LAST_TAG" | awk -F. '{printf "v%d.%d.%d",$1+0,$2,$3+1}')
+            VERSION=$(echo "$LAST_TAG" | sed 's/^v//' | awk -F. '{printf "v%d.%d.%d",$1,$2,$3+1}')
           fi
 
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Creating release $VERSION"
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
