@@ -6,7 +6,7 @@ import net.minecraft.world.GameMode;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ClientPlayerInteractionManager.class)
@@ -14,7 +14,7 @@ public class MixinClientPlayerInteractionManager {
     @Unique
     private static double microReach = 0.08;
 
-    @Inject(method = "attackEntity(Lnet/minecraft/entity/Entity;)Z", at = @At("HEAD"))
+    @Inject(method = "method_2903", at = @At("HEAD"))
     private void onAttack(Entity target, CallbackInfoReturnable<Boolean> cir) {
         if (!FourTripleVictoryClient.microReachEnabled || target == null) {
             return;

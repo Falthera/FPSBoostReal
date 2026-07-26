@@ -12,8 +12,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ClientPlayerEntity.class)
 public class MixinClientPlayerEntity {
-    @Inject(method = "attack", at = @At("HEAD"))
-    private void onAttack(Entity target, CallbackInfo ci) {
+    @Inject(method = "attack", at = @At("HEAD"), cancellable = true)
+    private void onAttack(Entity target, CallbackInfoReturnable<Boolean> cir) {
         if (!FourTripleVictoryClient.hitboxClipEnabled || target == null || !(target instanceof LivingEntity livingTarget)) {
             return;
         }
